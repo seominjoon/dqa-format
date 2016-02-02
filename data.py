@@ -81,12 +81,14 @@ def format_json(args):
         urls.append(image_url)
 
     if args.download:
-        image_folder_path = os.path.join(args.image_dir_path, "%s_%s_%s_images" % (task_type, data_type, data_subtype))
+        image_folder_path = os.path.join(args.image_dir_path, "%s_%s_images" % (data_type, data_subtype))
         if not os.path.exists(image_folder_path):
             os.mkdir(image_folder_path)
         bar = Bar('Downloading images', max=len(urls))
         for url in urls:
-            image_name = os.path.basename(url)
+            raw_image_name = os.path.basename(url)
+            image_id = int(os.path.splitext(raw_image_name)[0])
+            image_name = "%s_%s_%s.png" % (data_type, data_subtype, str(image_id).zfill(12))
             urllib.urlretrieve(url, os.path.join(image_folder_path, image_name))
             bar.next()
         bar.finish()
