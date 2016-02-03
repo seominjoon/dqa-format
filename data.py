@@ -110,7 +110,7 @@ def format_json_raw(args):
     data_subtype = args.data_subtype
 
     q_json_name = "%s_%s_%s_questions.json" % ('raw', data_type, data_subtype)
-    q_file_path = os.path.join(args.q_dir_path, q_json_name)
+    q_file_path = os.path.join(args.raw_dir_path, q_json_name)
 
     image_folder_path = os.path.join(args.image_dir_path, "%s_%s_images" % (data_type, data_subtype))
     if args.download and not os.path.exists(image_folder_path):
