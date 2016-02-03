@@ -5,6 +5,8 @@ import urllib
 import argparse
 from progress.bar import Bar
 
+from text2int import text2int
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--task_type', default='MultipleChoice')
 parser.add_argument('--data_type', default='shining')
@@ -68,7 +70,12 @@ def format_json(args):
         image_name = os.path.basename(image_url)
         image_id = int(os.path.splitext(image_name)[0])
         question_id = int(pid)
-        multiple_choices = [choice_1, choice_2, choice_3, choice_4]
+        multiple_choices = [choice_1.lower(), choice_2.lower(), choice_3.lower(), choice_4.lower()]
+        for idx, choice in enumerate(multiple_choices):
+            try:
+                multiple_choices[idx] = text2int(choice)
+            except:
+                pass
         answer_type = 'other'  # dummy
         multiple_choice_answer = multiple_choices[int(correct_choice)-1]
         question_type = 'what'  # dummy
