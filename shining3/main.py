@@ -63,6 +63,7 @@ def main(args):
             for question, answer_dict in question_json['questions'].iteritems():
                 abcLabel = answer_dict['abcLabel']
                 choices = answer_dict['answerTexts']
+                assert len(choices) == args.num_choices, "number of choices should be %d!" % num_choices
                 """
                 if args.text2int:
                     question = text2int(question)
@@ -84,6 +85,7 @@ def main(args):
                 question_id += 1
         pbar.update(idx)
     pbar.finish()
+    print("num images = %d, num questions = %d" % (len(image_paths), len(out_questions_dict['questions'])))
 
     print("Dumping json files ...")
     json.dump(out_questions_dict, open(out_questions_json_path, "wb"))
