@@ -43,14 +43,13 @@ def main(args):
     second_annotations = copy.deepcopy(annotations)
     second_annotations['annotations'] = second_annotations['annotations'][split_idx:]
 
-    assert len(first_questions['questions']) + len(second_questions['questions']) == len(questions['questions']), "???"
     print("Split: %s = %d, %s = %d" % (first_name, len(first_questions['questions']), second_name, len(second_questions['questions'])))
 
     print("dumping json files ...")
-    json.dump(first_questions, first_questions_path)
-    json.dump(first_annotations, first_annotations_path)
-    json.dump(second_questions, second_questions_path)
-    json.dump(second_annotations, second_annotations_path)
+    json.dump(first_questions, open(first_questions_path, 'wb'))
+    json.dump(first_annotations, open(first_annotations_path, 'wb'))
+    json.dump(second_questions, open(second_questions_path, 'wb'))
+    json.dump(second_annotations, open(second_annotations_path, 'wb'))
 
 if __name__ == "__main__":
     main(ARGS)
