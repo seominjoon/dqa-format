@@ -24,6 +24,7 @@ ARGS = parser.parse_args()
 def main(args):
     root_dir = args.root_dir
     out_dir = args.out_dir
+    num_choices = args.num_choices
     images_dir = os.path.join(root_dir, "images")
     questions_dir = os.path.join(root_dir, "questions")
     out_images_dir = os.path.join(out_dir, args.data_subtype)
