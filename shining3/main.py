@@ -17,7 +17,7 @@ parser.add_argument("--task_type", default="MultipleChoice")
 parser.add_argument("--num_choices", default=4, type=int)
 parser.add_argument("--valid_exts", default=".png,.jpg")
 parser.add_argument("--zfill_width", default=12, type=int)
-parser.add_argument("--text2int", default=True, type=bool)
+# parser.add_argument("--text2int", default=False, type=bool)  # not supported yet
 
 ARGS = parser.parse_args()
 
@@ -37,15 +37,16 @@ def main(args):
         os.mkdir(out_images_dir)
 
     valid_exts = args.valid_exts.split(",")
+    print("Valid exts: %s" % ", ".join(valid_exts))
 
-    image_paths = [os.path.join(root_dir, image_name) for image_name in os.listdir(images_dir)
-                   if os.path.isfile(os.path.join(root_dir, image_name)) and os.path.basename(image_name) in valid_exts]
+    image_paths = [os.path.join(images_dir, image_name) for image_name in os.listdir(images_dir)
+                   if os.path.isfile(os.path.join(images_dir, image_name)) and os.path.splitext(image_name)[1] in valid_exts]
     out_questions_dict = {'num_choices': args.num_choices,
                           'questions': []}
     out_annotations_dict = {'annotations': []}
 
     question_id = 0
-    string = "N=%d" % len(image_paths)
+    string = "N=%d|" % len(image_paths)
     pbar = pb.ProgressBar(widgets=[string, pb.Percentage(), pb.Bar(), pb.ETA()], maxval=len(image_paths))
     pbar.start()
     for idx, image_path in enumerate(image_paths):
@@ -56,28 +57,31 @@ def main(args):
         shutil.copy(image_path, out_image_path)
 
         question_json_path = os.path.join(questions_dir, "%s.json" % image_name)
-        question_json = json.load(open(question_json_path, "rb"))
-        assert question_json['imageName'] == image_name, "image names for %s do not match" % image_name
-        for question, answer_dict in question_json['questions'].iteritems():
-            abcLabel = answer_dict['abcLabel']
-            choices = answer_dict['answerTexts']
-            if args.text2int:
-                question = text2int(question)
-                choices = [text2int(choice) for choice in choices]
-            answer = choices[answer_dict['correctAnswer']]
+        if os.path.exists(question_json_path):
+            question_json = json.load(open(question_json_path, "rb"))
+            assert question_json['imageName'] == image_name, "image names for %s do not match" % image_name
+            for question, answer_dict in question_json['questions'].iteritems():
+                abcLabel = answer_dict['abcLabel']
+                choices = answer_dict['answerTexts']
+                """
+                if args.text2int:
+                    question = text2int(question)
+                    choices = [text2int(choice) for choice in choices]
+                """
+                answer = choices[answer_dict['correctAnswer']]
 
-            out_question_dict = {'question_id': question_id,
-                                 'image_id': image_id,
-                                 'question': question,
-                                 'multiple_choices': choices,
-                                 }
-            out_questions_dict['questions'].append(out_question_dict)
+                out_question_dict = {'question_id': question_id,
+                                     'image_id': image_id,
+                                     'question': question,
+                                     'multiple_choices': choices,
+                                     }
+                out_questions_dict['questions'].append(out_question_dict)
 
-            out_annotation_dict = {'question_id': question_id,
-                                   'image_id': image_id,
-                                   'multiple_choice_answer': answer}
-            out_annotations_dict['annotations'].append(out_annotation_dict)
-            question_id += 1
+                out_annotation_dict = {'question_id': question_id,
+                                       'image_id': image_id,
+                                       'multiple_choice_answer': answer}
+                out_annotations_dict['annotations'].append(out_annotation_dict)
+                question_id += 1
         pbar.update(idx)
     pbar.finish()
 
