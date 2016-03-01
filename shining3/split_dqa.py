@@ -10,7 +10,7 @@ def get_args():
     parser.add_argument("first_dir")
     parser.add_argument("--second_dir", default="", type=str)
     parser.add_argument('--num', default=0, type=int)
-    parser.add_argument('--skip_images', defaul=False, type=bool)
+    parser.add_argument('--skip_images', default=False, type=bool)
 
     return parser.parse_args()
 
