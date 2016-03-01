@@ -10,6 +10,7 @@ def get_args():
     parser.add_argument("first_dir")
     parser.add_argument("--second_dir", default="", type=str)
     parser.add_argument('--num', default=0, type=int)
+    parser.add_argument('--skip_images', defaul=False, type=bool)
 
     return parser.parse_args()
 
@@ -53,8 +54,9 @@ def split_dqa(args):
                 folder_path = os.path.join(to_dir, subdir)
                 if not os.path.exists(folder_path):
                     os.mkdir(folder_path)
-            for subdir in ['images', 'imagesReplacedText']:
-                _copy(data_dir, to_dir, image_name, subdir=subdir)
+            if not args.skip_images:
+                for subdir in ['images', 'imagesReplacedText']:
+                    _copy(data_dir, to_dir, image_name, subdir=subdir)
             for subdir in ['annotations', 'questions']:
                 _copy(data_dir, to_dir, json_name, subdir=subdir)
             pbar.update(i)
