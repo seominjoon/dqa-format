@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import random
 import shutil
 from utils import get_pbar
 
@@ -10,7 +11,8 @@ def get_args():
     parser.add_argument("first_dir")
     parser.add_argument("--second_dir", default="", type=str)
     parser.add_argument('--num', default=0, type=int)
-    parser.add_argument('--skip_images', default=False, type=bool)
+    parser.add_argument('--skip_images', typ=str, default='False')
+    parser.add_argument('--random', type=str, default='True')
 
     return parser.parse_args()
 
@@ -33,16 +35,15 @@ def split_dqa(args):
     if second_dir and not os.path.exists(second_dir):
         os.mkdir(second_dir)
     num = args.num
-    image_names = os.listdir(os.path.join(data_dir, "images"))
+    image_names = [name for name in os.listdir(os.path.join(data_dir, "images")) if name.endswith(".png")]
+    if args.random == 'True':
+        random.shuffle(image_names)
     if num:
         pbar = get_pbar(len(image_names)).start()
         for i, image_name in enumerate(image_names):
-            if not image_name.endswith(".png"):
-                pbar.update(i)
-                continue
             image_id, ext = os.path.splitext(image_name)
             json_name = "%s.json" % image_name
-            if int(image_id) < num:
+            if i < num:
                 to_dir = first_dir
             elif second_dir:
                 to_dir = second_dir
@@ -54,7 +55,7 @@ def split_dqa(args):
                 folder_path = os.path.join(to_dir, subdir)
                 if not os.path.exists(folder_path):
                     os.mkdir(folder_path)
-            if not args.skip_images:
+            if args.skip_images == 'False':
                 for subdir in ['images', 'imagesReplacedText']:
                     _copy(data_dir, to_dir, image_name, subdir=subdir)
             for subdir in ['annotations', 'questions']:
