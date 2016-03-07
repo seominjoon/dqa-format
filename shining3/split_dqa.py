@@ -43,6 +43,7 @@ def split_dqa(args):
     num = args.num
     image_names = [name for name in os.listdir(os.path.join(data_dir, "images"))
                    if name.endswith(".png") and args.start <= int(os.path.splitext(name)[0]) < args.stop]
+    image_names = sorted(image_names, key=lambda x: int(os.path.splitext(x)[0]))
     if args.random == 'True':
         random.shuffle(image_names)
     if num:
